@@ -46,7 +46,14 @@ export default function Trips() {
     }
 
     try {
-      await addTrip({ route:{id:routeId}, bus:{id:busId} });
+      // await addTrip({ route:{id:routeId}, bus:{id:busId} });.
+      await addTrip({
+        startTime: new Date().toISOString(),   // send current time
+  endTime: null,                         // no end time yet
+  route: { id: routeId },
+  bus: { id: busId },
+  status: "INACTIVE"                     // matches enum
+});
 
       setShowForm(false);
       setRouteId(""); 
