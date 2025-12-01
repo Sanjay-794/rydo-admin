@@ -38,32 +38,37 @@ export default function Trips() {
 
   // ================= CREATE TRIP =================
   const handleAddTrip = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if(!routeId || !busId){
-      alert("⚠ Select both Route & Bus before creating trip");
-      return;
-    }
+  // Get full selected Route + Bus objects from loaded lists
+  const routeObj = routes.find(r => r.id == routeId);
+  const busObj = buses.find(b => b.id == busId);
 
-    try {
-      // await addTrip({ route:{id:routeId}, bus:{id:busId} });.
-      await addTrip({
-        startTime: new Date().toISOString(),   // send current time
-  endTime: null,                         // no end time yet
-  route: { id: routeId },
-  bus: { id: busId },
-  status: "INACTIVE"                     // matches enum
-});
+  if (!routeObj || !busObj) {
+    alert("⚠ Route or Bus object missing");
+    return;
+  }
 
-      setShowForm(false);
-      setRouteId(""); 
-      setBusId("");
-      loadTrips();
+  try {
+    await addTrip({
+      startTime: null,        // same as Postman
+      endTime: null,          // null until trip ends
+      status: "INACTIVE",     // enum matches backend
+      route: routeObj,        // FULL OBJECT not only id
+      bus: busObj             // FULL OBJECT not only id
+    });
 
-    }catch(err){
-      alert(err.response?.data?.data ?? "Trip creation failed");
-    }
-  };
+    setShowForm(false);
+    setRouteId("");
+    setBusId("");
+    loadTrips();
+
+  } catch (err) {
+    console.log("TRIP CREATION ERROR >>>", err.response?.data);
+    alert(err.response?.data?.data ?? "Trip creation failed");
+  }
+};
+
 
 
   // ================= DELETE TRIP =================
